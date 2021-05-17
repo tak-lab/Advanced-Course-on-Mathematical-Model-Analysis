@@ -5,3 +5,4 @@
 - `/2020`フォルダに2020年度で使用したMATLABコードが入ってます。
 - [`lecture2_Fourier_Chebyshev_SpectralMethod.ipynb`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/lecture2_Fourier_Chebyshev_SpectralMethod.ipynb)は[`lec2.m`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/2020/lec2.m)をJuliaに翻訳したものです。
 - [`lecture3_DFT_Convolution.ipynb`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/lecture3_DFT_Convolution.ipynb)は[`lec3.m`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/2020/lec3.m)をJuliaに翻訳したものです。
+- [`lecture5_Newton_Kantorovich.ipynb`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/lecture5_Newton_Kantorovich.ipynb)は[`lec4`](https://github.com/tak-lab/Advanced-Course-on-Mathematical-Model-Analysis/blob/main/2020/lec5/)内の例(ex*.m)をJuliaに翻訳したものです。
