@@ -171,7 +171,7 @@ end
 
 # Newton-iteration
 function newton(a)
-    tol = 5e-13; # tolerance for Newton's method
+    tol = 5e-11; # tolerance for Newton's method
     F = F_steady_states(a)
     nF = norm(F,1)
     println("Before iteration: $(nF)")
@@ -216,21 +216,22 @@ function  rad_poly_eigenpairs(a,nu)
 
     ### Y0 ###
     a_ext = [a;zeros(ComplexF64,m-1)] 
-    inu = interval(nu);
+    inu = interval(nu)
     F1_ext = iF_steady_states(a_ext)
     omega = 2*@interval(pi)
     k_tail = (m:2*m-2)
     mu_k_tail = omega^2 .* interval.(-k_tail.^2)
     y1_F = abs.(iA*F1_ext[1:m])#y_F(2:m+1); 
     y1_tail = abs.(F1_ext[m+1:2*m-1]./mu_k_tail)
-    y1 = [y1_F;y1_tail];
-    nu_power = [1; 2*inu.^interval.(1:2*m-2)]
-    Y0 = mag(sum(y1.*nu_power))
+    y1 = [y1_F;y1_tail]
+    # nu_power = [1; 2*inu.^interval.(1:2*m-2)]
+    # Y0 = mag(sum(y1.*nu_power))
+    Y0 = norma(y1,nu)
 
     ### Z0 ###
     iDF = iDF_steady_states(a)
     B = I - iA*iDF
-    Z0 = operator_norm(B,inu,0);
+    Z0 = operator_norm(B,inu,0)
 
     ### Z1 ###
     hQa = zeros(m,1)#; hQb = zeros(m,1);
@@ -240,7 +241,7 @@ function  rad_poly_eigenpairs(a,nu)
     end
 
     hQa = interval.(hQa)
-    Z1 = 2*norma(iA*hQa,inu)
+    Z1 = mag(2*norma(iA*hQa,inu) + norma(a,inu)/(2*m^2*@interval(pi)^2))
 
     ### Z2 ###
     normA = operator_norm(iA,inu,1)
