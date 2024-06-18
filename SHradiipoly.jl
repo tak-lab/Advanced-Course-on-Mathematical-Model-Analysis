@@ -1,4 +1,4 @@
-# solve Swift-Hohenberg
+# solve Swift-Hohenberg via Newton
 
 function F!(F, u, λ)
     ∂² = project(Derivative(2), space(u), space(u))
@@ -8,7 +8,7 @@ end
 
 function DF!(DF, u, λ)
     ∂² = project(Derivative(2), space(u), space(u))
-    add!(DF, λ * I - (I + ∂²)^2, Multiplication(-3u^2))
+    add!(DF, λ * I - (I + ∂²)^2, Multiplication(-3*u^2))
     return DF
 end
 
@@ -18,55 +18,72 @@ m = 10
 N = m-1
 λ = 1.0
 ω = 1.0
-ν = 1.0
 u = Sequence(CosFourier(N, ω), rand(N+1))
 
 newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u)
 
 
 # using GLMakie
-
 # lines(LinRange(0, π, 101), x -> u(x); linewidth = 6)
+
 using Plots
 plot(x -> u(x),0 ,π, legend=false, title = "Plot cosine Fourier series",
         line=2,
         xlabel = "\$x\$",
         ylabel = "\$u(x)\$",)
 
+# Start validation
+function iF!(F, u, λ)
+    ∂² = project(Derivative(2), space(u), space(u))
+    project!(F, λ * u - interval.((I + ∂²)^2) * u - u^3)
+    return F
+end
+
+function iDF!(DF, u, λ)
+    ∂² = project(Derivative(2), space(u), space(u))
+    iI = interval(Matrix(1.0I, length(u), length(u)))
+    μ = LinearOperator(space(u), space(u), λ * iI) - interval.((I + ∂²)^2)
+    add!(DF, μ, Multiplication(-interval(3)*u^2))
+    return DF
+end
+
 # A† , An
-_DF_ = DF!(zeros(CosFourier(N, ω), CosFourier(N, ω)), u, λ)
-A = inv(_DF_)
-tail_A_norm = inv(abs(λ - (1 - (N+1)^2)^2))
+iu = interval.(u)
+iλ = interval(λ)
+iν = interval(1.0)
+
+# Function space
+X = Ell1(GeometricWeight(iν))
+# 
+_DF_ = DF!(zeros(eltype(u), CosFourier(N, ω), CosFourier(N, ω)), u, λ)
+iA = interval.(inv(_DF_))
+tail_A_norm = inv(abs(iλ - interval(1 - (N+1)^2)^2))
 
 # Y0 bound
-F = F!(zeros(CosFourier(3N, ω)), u, λ)
-tail_F = copy(F)
-tail_F[0:N] .= 0
+iF = iF!(zeros(eltype(iu),CosFourier(3N, ω)), iu, iλ)
+tail_F = copy(iF)
+tail_F[0:N] .= interval(0)
+Y = norm(iA * iF, X) + norm(tail_F, X) * tail_A_norm
 
-Y = norm(A * F, Ell1(GeometricWeight(ν))) + norm(tail_F, Ell1(GeometricWeight(ν))) * tail_A_norm
+# Z bound
+iDF = iDF!(zeros(eltype(iu),CosFourier(3N, ω), CosFourier(N, ω)), iu, iλ)
 
-#
-
-# Z
-DF = DF!(zeros(CosFourier(3N, ω), CosFourier(N, ω)), u, λ)
-
-u²3 = 3u^2
-tail_u²3 = copy(u²3)
-tail_u²3[0:N] .= 0
+iu²3 = interval(3)iu^2
+tail_u²3 = copy(iu²3)
+tail_u²3[0:N] .= interval(0)
 
 # Z0 + Z1
-Z = max(opnorm(A * DF - I, Ell1(GeometricWeight(ν))) + norm(tail_u²3, Ell1(GeometricWeight(ν))) * tail_A_norm,
-        norm(u²3, Ell1(GeometricWeight(ν))) * inv(abs(λ - (1 - (3N+1)^2)^2)))
+iI = LinearOperator(CosFourier(3N, ω), CosFourier(N, ω), interval(Matrix(1.0I,N+1,3N+1)))
+Z = max(opnorm(iA * iDF - iI, X) + norm(tail_u²3, X) * tail_A_norm,
+        norm(iu²3, X) * inv(abs(iλ - interval(1 - (3N+1)^2)^2)))
 
 #
 
-R = 2sup(Y)
-
-W = 6max(opnorm(A, 1), tail_A_norm)*(norm(u, 1) + R)
-
+R = interval(2sup(Y))
+W = interval(6) * max(opnorm(iA, X), tail_A_norm)*(norm(iu, X) + R)
+Z2 = interval(3) * max(opnorm(iA, X), tail_A_norm)*(interval(2) * norm(iu, X) + R)
 #
-
-interval_of_existence(interval(Y), interval(Z), interval(W), R)
+r = interval_of_existence(Y, Z, W, mid(R))
 
 
 
