@@ -14,11 +14,20 @@ end
 
 using RadiiPolynomial
 
-m = 10
+# m = 10
+# N = m-1
+# λ = 1.0
+# L = 2π
+# ω = 1.0
+# u = Sequence(CosFourier(N, ω), rand(N+1))
+
+
+m = 21
 N = m-1
-λ = 1.0
-ω = 1.0
-u = Sequence(CosFourier(N, ω), rand(N+1))
+λ = 5.0
+L = 6π
+ω = 1.0/3.0 # 2π/L
+u = Sequence(CosFourier(N, ω), 100*randn(N+1)./(1:N+1).^2)
 
 newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u)
 
@@ -27,7 +36,7 @@ newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u)
 # lines(LinRange(0, π, 101), x -> u(x); linewidth = 6)
 
 using Plots
-plot(x -> u(x),0 ,π, legend=false, title = "Plot cosine Fourier series",
+plot(x -> u(x),0 ,L, legend=false, title = "Plot cosine Fourier series",
         line=2,
         xlabel = "\$x\$",
         ylabel = "\$u(x)\$",)
