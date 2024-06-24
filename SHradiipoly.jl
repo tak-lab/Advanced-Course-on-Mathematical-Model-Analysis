@@ -32,7 +32,11 @@ plot(x -> u(x),0 ,π, legend=false, title = "Plot cosine Fourier series",
         xlabel = "\$x\$",
         ylabel = "\$u(x)\$",)
 
+
+#######################################
 # Start validation
+#######################################
+
 function iF!(F, u, λ)
     ∂² = project(Derivative(2), space(u), space(u))
     project!(F, λ * u - interval.((I + ∂²)^2) * u - u^3)
