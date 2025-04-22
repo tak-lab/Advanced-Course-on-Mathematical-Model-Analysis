@@ -22,14 +22,14 @@ using RadiiPolynomial
 # u = Sequence(CosFourier(N, ω), rand(N+1))
 
 
-m = 21
+m = 51
 N = m-1
 λ = 5.0
 L = 6π
 ω = 1.0/3.0 # 2π/L
-u = Sequence(CosFourier(N, ω), 100*randn(N+1)./(1:N+1).^2)
+u = Sequence(CosFourier(N, ω), 100*randn(N+1)./(1:N+1).^3)
 
-newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u)
+newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u, maxiter=100)
 
 
 # using GLMakie
