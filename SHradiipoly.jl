@@ -36,7 +36,7 @@ newton!((F, DF, u) -> (F!(F, u, λ), DF!(DF, u, λ)), u, maxiter=100)
 # lines(LinRange(0, π, 101), x -> u(x); linewidth = 6)
 
 using Plots
-plot(x -> u(x),0 ,L, legend=false, title = "Plot cosine Fourier series",
+plot(x -> u(x),-L/2 ,L/2, legend=false, title = "Plot cosine Fourier series",
         line=2,
         xlabel = "\$x\$",
         ylabel = "\$u(x)\$",)
